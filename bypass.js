@@ -85,12 +85,18 @@ async function startSpoofedSession() {
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update
 
-        if (qr) {
+        /*if (qr) {
             qrcode.generate(qr, { small: false }, (code) => {
                 console.log('\nScan this QR code with WhatsApp:\n')
                 console.log(code)
             })
-        }
+        }*/
+        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`;
+    
+        console.log('\n==================================================');
+        console.log('Abra o link abaixo no navegador para escanear o WhatsApp:');
+        console.log(qrImageUrl);
+        console.log('==================================================\n');
 
         if (connection === 'close') {
             if (presenceTimer) { clearTimeout(presenceTimer); presenceTimer = null }
