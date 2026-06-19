@@ -10,4 +10,6 @@ RUN npm install
 
 RUN mkdir -p downloads auth_info_android_bypass
 
+EXPOSE 15000
+
 CMD ["npm", "start"]
