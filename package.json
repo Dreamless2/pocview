@@ -1,0 +1,20 @@
+{
+  "name": "waview",
+  "version": "1.0.0",
+  "description": "PoC for bypassing WhatsApp View Once",
+  "main": "bypass.js",
+  "type": "module",
+  "scripts": {
+    "postinstall": "node patch-baileys.js",
+    "start": "node bypass.js"
+  },
+  "author": "Optimusprime123",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
+    "@whiskeysockets/baileys": "7.0.0-rc.9",
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "pino": "10.3.1",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
