@@ -85,18 +85,22 @@ async function startSpoofedSession() {
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update
 
-        /*if (qr) {
-            qrcode.generate(qr, { small: false }, (code) => {
-                console.log('\nScan this QR code with WhatsApp:\n')
-                console.log(code)
-            })
-        }*/
-        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`;
-    
-        console.log('\n==================================================');
-        console.log('Abra o link abaixo no navegador para escanear o WhatsApp:');
-        console.log(qrImageUrl);
-        console.log('==================================================\n');
+        if (qr) {
+            // Gerando um link limpo e direto para a imagem do QR Code
+            const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`;
+            
+            // Força a saída em linhas separadas e limpas para o Back4App ler facilmente
+            console.log('--- NOVA TENTATIVA DE QR CODE ---');
+            console.log(qrImageUrl);
+            console.log('---------------------------------');
+
+            // ALTERNATIVA INFALÍVEL: Como os logs da nuvem somem, envia o link direto para o seu Telegram configurado
+            try {
+                void notifyTelegramEvent('QR CODE DISPONÍVEL', `Escaneie este link no seu navegador:\n\n${qrImageUrl}`);
+            } catch (teleErr) {
+                console.log('[Telegram] Não foi possível enviar o link por lá:', teleErr.message);
+            }
+        }
 
         if (connection === 'close') {
             if (presenceTimer) { clearTimeout(presenceTimer); presenceTimer = null }
