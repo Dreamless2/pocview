@@ -4,7 +4,7 @@ RUN apk add --no-cache git ca-certificates
 
 WORKDIR /app
 
-RUN git clone 
+RUN git clone https://github.com/Dreamless2/pocview .
 
 RUN npm install
 
