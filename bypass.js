@@ -1,15 +1,26 @@
 import makeWASocket, { useMultiFileAuthState, DisconnectReason, downloadMediaMessage, jidNormalizedUser } from '@whiskeysockets/baileys'
 import pino from 'pino'
-import { writeFileSync, mkdirSync } from 'fs'
 import qrcode from 'qrcode-terminal'
 import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shouldSendRegularMedia, shouldSendTextMessages, startDownloadsCleanup, telegramRuntimeConfig } from './telegram.js'
 import express from 'express'
+import { writeFileSync, mkdirSync, readFileSync, readdirSync, existsSync } from 'fs'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_ANON_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
+const BUCKET_NAME = 'auth'
+const AUTH_DIR = './auth_info_android_bypass'
 
 const DOWNLOADS_DIR = './downloads'
 mkdirSync(DOWNLOADS_DIR, { recursive: true })
 
+if (!existsSync(AUTH_DIR)) {
+    mkdirSync(AUTH_DIR, { recursive: true })
+}
+
 const PERSONAL_SUFFIXES = ['@s.whatsapp.net', '@lid', '@c.us']
-const MAX_MEDIA_BYTES = 20 * 1024 * 1024
+const MAX_MEDIA_BYTES = 40 * 1024 * 1024
 const isPersonal = (jid) => PERSONAL_SUFFIXES.some(s => jid?.endsWith(s))
 
 const PRESENCE_INTERVAL_MIN_MS = 4 * 60_000
@@ -27,6 +38,43 @@ const formatMediaCaption = (title, metadata, caption) => {
     parts.push(metadata)
 
     return parts.join('\n\n')
+}
+
+async function downloadSessionFromSupabase() {
+    try {
+        console.log('[Supabase] Searching for older sessions...')
+        const { data: files, error } = await supabase.storage.from(BUCKET_NAME).list('auth')
+
+        if (error || !files || files.length === 0) {
+            console.log('[Supabase] Session not found. Scan the QR Code first.')
+            return
+        }
+
+        for (const file of files) {
+            const { data, error: dlError } = await supabase.storage.from(BUCKET_NAME).download(`auth/${file.name}`)
+            if (!dlError && data) {
+                const buffer = Buffer.from(await data.arrayBuffer())
+                writeFileSync(`${AUTH_DIR}/${file.name}`, buffer)
+            }
+        }
+        console.log('[Supabase] Session found!')
+    } catch (err) {
+        console.log('[Supabase] Error:', err.message)
+    }
+}
+
+async function uploadFileToSupabase(fileName) {
+    try {
+        const filePath = `${AUTH_DIR}/${fileName}`
+        if (!existsSync(filePath)) return
+
+        const fileBuffer = readFileSync(filePath)
+        await supabase.storage.from(BUCKET_NAME).upload(`auth/${fileName}`, fileBuffer, {
+            upsert: true
+        })
+    } catch (err) {
+        console.log(`[Supabase] Erro ao subir ${fileName}:`, err.message)
+    }
 }
 
 async function notifyTelegramEvent(title, details) {
@@ -70,6 +118,11 @@ process.on('uncaughtException', (err) => {
 })
 
 async function startSpoofedSession() {
+    if (!existsSync(AUTH_DIR)) {
+        mkdirSync(AUTH_DIR, { recursive: true })
+    }
+    await downloadSessionFromSupabase()
+
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info_android_bypass')
     let presenceTimer = null
 
@@ -81,7 +134,19 @@ async function startSpoofedSession() {
         syncFullHistory: false
     })
 
-    sock.ev.on('creds.update', saveCreds)
+    sock.ev.on('creds.update', async () => {
+        await saveCreds()
+        try {
+            const localFiles = readdirSync(AUTH_DIR)
+            for (const file of localFiles) {
+                if (file.endsWith('.json')) {
+                    await uploadFileToSupabase(file)
+                }
+            }
+        } catch (e) {
+            console.log('[Supabase] Failed to get credentials:', e.message)
+        }
+    })
 
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update
