@@ -125,4 +125,4 @@ if (src.includes(oldGetPlatformType)) {
 
 writeFileSync(TARGET, src)
 console.log('\nDone. Baileys will now register as an Android device.')
-console.log('IMPORTANT: Delete folder auth_info_android_bypass before re-pairing — server remembers device type from registration.')
+console.log('IMPORTANT: Delete folder auth_info_android_bypass before re-pairing (server remembers device type from registration).')
