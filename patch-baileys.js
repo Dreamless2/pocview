@@ -51,14 +51,12 @@ if (!src.includes('Platform.WEB')) {
     console.log('Already patched or source changed — skipping UserAgent patch')
 } else {
     src = src.replace(oldUserAgent, newUserAgent)
-    // Add crypto import if not present
     if (!src.includes("import crypto") && !src.includes("import { randomUUID }")) {
         src = `import crypto from 'crypto';\n` + src
     }
     console.log('Patched getUserAgent: Platform.ANDROID, DeviceType.PHONE, device=frankel')
 }
 
-// 2. Patch getWebInfo() — Android clients do NOT send webInfo at all
 const oldWebInfo = `const getWebInfo = (config) => {
     let webSubPlatform = proto.ClientPayload.WebInfo.WebSubPlatform.WEB_BROWSER;
     if (config.syncFullHistory &&
