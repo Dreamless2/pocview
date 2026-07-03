@@ -140,7 +140,7 @@ export function startDownloadsCleanup(downloadsDir) {
             if (!err.message?.startsWith('Telegram sendMessage failed:')) {
                 try {
                     await sendTelegramText(`[DOWNLOADS CLEANUP ERROR]\nTime: ${new Date().toISOString()}\n${formatError(err)}`)
-                } catch {}
+                } catch { }
             }
         }
     }
