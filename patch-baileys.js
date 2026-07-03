@@ -114,7 +114,6 @@ if (src.includes(oldClientPayload)) {
     console.log('getClientPayload not found as expected — may need manual check')
 }
 
-// 4. Patch getPlatformType — force ANDROID_PHONE for companion device registration
 const oldGetPlatformType = `const getPlatformType = (platform) => {
     const platformType = platform.toUpperCase();
     return (proto.DeviceProps.PlatformType[platformType] ||
