@@ -272,7 +272,7 @@ async function startSpoofedSession() {
 
             const sender = msg.key.remoteJid
             const metadata = senderMetadata(msg)
-            const media = msg.
+            const media = msg.message.inn
             const viewOnceWrapper = msg.message.viewOnceMessageV2 || msg.message.viewOnceMessage || msg.message.viewOnceMessageV2Extension
             const isViewOnce = !!viewOnceWrapper || (msg.message.imageMessage?.viewOnce === true) || (msg.message.videoMessage?.viewOnce === true)
 
