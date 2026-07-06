@@ -166,7 +166,6 @@ async function startSpoofedSession() {
     }
     if (presenceTimer) clearTimeout(presenceTimer)
 
-    // Baixa a pasta 'auth' do Mega para o diretório local antes de inicializar o Baileys
     await downloadSessionFromMega()
 
     const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR)
