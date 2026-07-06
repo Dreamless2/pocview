@@ -94,7 +94,6 @@ async function uploadFileToMega(fileName) {
         const storage = await loginMega()
         if (!storage) return
 
-        // Procura a pasta 'auth', se não existir, cria ela
         let authFolder = storage.children.find(c => c.name === 'auth' && c.directory)
         if (!authFolder && storage.mkdir) {
             authFolder = await storage.mkdir('auth')
@@ -102,8 +101,6 @@ async function uploadFileToMega(fileName) {
 
         const targetFolder = authFolder || storage
 
-        // Como o MegaJS não tem 'upsert' nativo por padrão para arquivos individuais,
-        // checamos se ele já existe na nuvem e deletamos a versão antiga antes de subir a nova.
         const existingFile = targetFolder.children ? targetFolder.children.find(c => c.name === fileName) : null
         if (existingFile) {
             await existingFile.delete()
@@ -111,7 +108,7 @@ async function uploadFileToMega(fileName) {
 
         await targetFolder.upload(fileName, fileBuffer).complete
     } catch (err) {
-        console.log(`[Mega] Error  ${fileName} para o Mega:`, err.message)
+        console.log(`[Mega] Error uploading ${fileName} to Mega:`, err.message)
     }
 }
 // ------------------------------------
