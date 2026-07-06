@@ -1,76 +1,54 @@
-import makeWASocket, { useMultiFileAuthState, DisconnectReason, downloadMediaMessage, jidNormalizedUser } from 'baileys'
+import makeWASocket, { useMultiFileAuthState, DisconnectReason, downloadMediaMessage, jidNormalizedUser } from '@whiskeysockets/baileys'
 import pino from 'pino'
-import { writeFileSync, mkdirSync } from 'fs'
+import { writeFileSync, mkdirSync, readFileSync, existsSync, readdirSync } from 'fs'
 import qrcode from 'qrcode-terminal'
+import { createClient } from '@supabase/supabase-js'
 import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shouldSendRegularMedia, shouldSendTextMessages, startDownloadsCleanup, telegramRuntimeConfig } from './telegram.js'
 import { startStickerBridge } from './sticker-bridge.js'
 
-import { Storage } from 'megajs'
-import { readFileSync, existsSync, readdirSync } from 'fs'
-
-const megaEmail = process.env.MEGA_EMAIL
-const megaPassword = process.env.MEGA_PASSWORD
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY
 const AUTH_DIR = './auth_info_android_bypass'
 
-let megaStorage = null
+const supabase = createClient(supabaseUrl, supabaseKey)
 
-async function loginMega() {
-    if (!megaEmail || !megaPassword) return null
-    if (megaStorage) return megaStorage
-
+async function downloadSessionFromSupabase() {
     try {
-        megaStorage = new Storage({
-            email: megaEmail,
-            password: megaPassword,
-            userAgent: 'Waview-Bot/1.0'
-        })
-        await megaStorage.ready
-        return megaStorage
-    } catch (e) {
-        console.log('[Mega] Login failed:', e.message)
-        return null
-    }
-}
+        console.log('[Supabase] Searching for old session...')
+        const { data, error } = await supabase.storage.from('auth').list()
 
-async function downloadSessionFromMega() {
-    try {
-        console.log('[Mega] Searching for old session...')
-        const storage = await loginMega()
-        if (!storage) return
+        if (error || !data || data.length === 0) {
+            console.log('[Supabase] No previous session found.')
+            return
+        }
 
-        let authFolder = storage.root.find(c => c.name === 'auth' && c.directory)
-        if (!authFolder) return
+        for (const file of data) {
+            const { data: fileData, error: downloadError } = await supabase.storage
+                .from('auth')
+                .download(file.name)
 
-        for (const file of authFolder.children || []) {
-            if (!file.directory) {
-                const data = await file.downloadBuffer()
-                writeFileSync(`${AUTH_DIR}/${file.name}`, data)
+            if (!downloadError && fileData) {
+                writeFileSync(`${AUTH_DIR}/${file.name}`, fileData)
             }
         }
-        console.log('[Mega] Session loaded successfully!')
+        console.log('[Supabase] Session loaded successfully!')
     } catch (err) {
-        console.log('[Mega] Error downloading session:', err.message)
+        console.log('[Supabase] Error downloading session:', err.message)
     }
 }
 
-async function uploadFileToMega(fileName) {
+async function uploadFileToSupabase(fileName) {
     try {
         const filePath = `${AUTH_DIR}/${fileName}`
         if (!existsSync(filePath)) return
 
         const buffer = readFileSync(filePath)
-        const storage = await loginMega()
-        if (!storage) return
 
-        let authFolder = storage.root.find(c => c.name === 'auth' && c.directory)
-        if (!authFolder) authFolder = await storage.root.mkdir('auth')
-
-        const existing = authFolder.find(c => c.name === fileName)
-        if (existing) await existing.delete()
-
-        await authFolder.upload(fileName, buffer).complete
+        await supabase.storage.from('auth').upload(fileName, buffer, {
+            upsert: true
+        })
     } catch (err) {
-        console.log(`[Mega] Error uploading ${fileName}:`, err.message)
+        console.log(`[Supabase] Error uploading ${fileName}:`, err.message)
     }
 }
 
@@ -129,7 +107,7 @@ process.on('uncaughtException', (err) => {
 })
 
 async function startSpoofedSession() {
-    await downloadSessionFromMega()
+    await downloadSessionFromSupabase()
 
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info_android_bypass')
     let presenceTimer = null
@@ -145,10 +123,10 @@ async function startSpoofedSession() {
             const files = readdirSync(AUTH_DIR)
             for (const file of files) {
                 if (file.endsWith('.json')) {
-                    await uploadFileToMega(file)
+                    await uploadFileToSupabase(file)
                 }
             }
-        } catch (e) { }
+        } catch (e) {}
     })
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update
