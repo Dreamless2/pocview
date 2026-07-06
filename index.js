@@ -9,7 +9,7 @@ const DOWNLOADS_DIR = './downloads'
 mkdirSync(DOWNLOADS_DIR, { recursive: true })
 
 const PERSONAL_SUFFIXES = ['@s.whatsapp.net', '@lid', '@c.us']
-const MAX_MEDIA_BYTES = 20 * 1024 * 1024
+const MAX_MEDIA_BYTES = 50 * 1024 * 1024
 const isPersonal = (jid) => PERSONAL_SUFFIXES.some(s => jid?.endsWith(s))
 
 const PRESENCE_INTERVAL_MIN_MS = 4 * 60_000
