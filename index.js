@@ -118,7 +118,6 @@ async function uploadFileToMega(fileName) {
             authFolder = await storage.root.mkdir('auth')
         }
 
-        // Delete old version if exists
         const existing = authFolder.find(c => c.name === fileName)
         if (existing) {
             await existing.delete()
