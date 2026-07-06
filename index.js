@@ -75,7 +75,7 @@ async function loginMega() {
 
 async function downloadSessionFromMega() {
     try {
-        console.log('[Mega] Buscando sessão antiga...')
+        console.log('[Mega] Searching for old session...')
         const storage = await loginMega()
         if (!storage) return
 
