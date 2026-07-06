@@ -44,17 +44,31 @@ let globalSock = null
 let presenceTimer = null
 let isShuttingDown = false
 
-// --- SISTEMA DE ARMAZENAMENTO MEGAJS ---
+let megaStorage = null
 
 async function loginMega() {
     if (!megaEmail || !megaPassword) {
         console.log('[Mega] Credenciais ausentes nas variáveis de ambiente.')
         return null
     }
+
+    if (megaStorage) return megaStorage
+
     try {
-        return await new File({ email: megaEmail, password: megaPassword }).link
+        console.log('[Mega] Logging into Mega...')
+        
+        megaStorage = new Storage({
+            email: megaEmail,
+            password: megaPassword,
+            userAgent: 'WhatsView-Bot/1.0'  // Recommended
+        })
+
+        await megaStorage.ready  // Important!
+        console.log('[Mega] Login successful!')
+        return megaStorage
     } catch (e) {
         console.log('[Mega] Erro de autenticação:', e.message)
+        megaStorage = null
         return null
     }
 }
@@ -65,10 +79,16 @@ async function downloadSessionFromMega() {
         const storage = await loginMega()
         if (!storage) return
 
-        // Procura a pasta 'auth' no diretório raiz do Mega
-        let authFolder = storage.children.find(c => c.name === 'auth' && c.directory)
-        if (!authFolder || !authFolder.children || authFolder.children.length === 0) {
-            console.log('[Mega] Nenhuma sessão antiga encontrada no Mega.')
+        // Find or create 'auth' folder
+        let authFolder = storage.root.find(c => c.name === 'auth' && c.directory)
+        
+        if (!authFolder) {
+            console.log('[Mega] Pasta "auth" não encontrada. Criando...')
+            authFolder = await storage.root.mkdir('auth')
+        }
+
+        if (!authFolder.children || authFolder.children.length === 0) {
+            console.log('[Mega] Nenhuma sessão antiga encontrada.')
             return
         }
 
@@ -76,11 +96,12 @@ async function downloadSessionFromMega() {
             if (!file.directory) {
                 const data = await file.downloadBuffer()
                 writeFileSync(`${AUTH_DIR}/${file.name}`, data)
+                console.log(`[Mega] Downloaded: ${file.name}`)
             }
         }
-        console.log('[Mega] Sessão antiga carregada com sucesso do Mega!')
+        console.log('[Mega] Sessão carregada com sucesso!')
     } catch (err) {
-        console.log('[Mega] Erro ao baixar sessão do Mega:', err.message)
+        console.log('[Mega] Erro ao baixar sessão:', err.message)
     }
 }
 
@@ -88,29 +109,28 @@ async function uploadFileToMega(fileName) {
     try {
         const filePath = `${AUTH_DIR}/${fileName}`
         if (!existsSync(filePath)) return
-        const fileBuffer = readFileSync(filePath)
 
+        const fileBuffer = readFileSync(filePath)
         const storage = await loginMega()
         if (!storage) return
 
-        let authFolder = storage.children.find(c => c.name === 'auth' && c.directory)
-        if (!authFolder && storage.mkdir) {
-            authFolder = await storage.mkdir('auth')
+        let authFolder = storage.root.find(c => c.name === 'auth' && c.directory)
+        if (!authFolder) {
+            authFolder = await storage.root.mkdir('auth')
         }
 
-        const targetFolder = authFolder || storage
-
-        const existingFile = targetFolder.children ? targetFolder.children.find(c => c.name === fileName) : null
-        if (existingFile) {
-            await existingFile.delete()
+        // Delete old version if exists
+        const existing = authFolder.find(c => c.name === fileName)
+        if (existing) {
+            await existing.delete()
         }
 
-        await targetFolder.upload(fileName, fileBuffer).complete
+        await authFolder.upload(fileName, fileBuffer).complete
+        console.log(`[Mega] Uploaded: ${fileName}`)
     } catch (err) {
-        console.log(`[Mega] Error uploading ${fileName} to Mega:`, err.message)
+        console.log(`[Mega] Error uploading ${fileName}:`, err.message)
     }
 }
-// ------------------------------------
 
 async function notifyTelegramEvent(title, details) {
     try {
