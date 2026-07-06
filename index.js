@@ -5,6 +5,11 @@ import qrcode from 'qrcode-terminal'
 import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shouldSendRegularMedia, shouldSendTextMessages, startDownloadsCleanup, telegramRuntimeConfig } from './telegram.js'
 import { startStickerBridge } from './sticker-bridge.js'
 
+const app = express()
+const PORT = process.env.PORT || 15000
+app.get('/', (req, res) => res.send('Started!'))
+app.listen(PORT, () => console.log(`Serving on port ${PORT}`))
+
 const DOWNLOADS_DIR = './downloads'
 mkdirSync(DOWNLOADS_DIR, { recursive: true })
 
