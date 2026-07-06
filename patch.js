@@ -1,5 +1,5 @@
 /**
- * Post-install patch for @whiskeysockets/baileys
+ * Post-install patch for baileys
  * Spoofs UserAgent and companion device props to present as Android (Pixel 10) WhatsApp client.
  * Without this, the server identifies us as a web client and withholds view-once media.
  */

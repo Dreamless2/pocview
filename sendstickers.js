@@ -1,4 +1,4 @@
-import makeWASocket, { useMultiFileAuthState, DisconnectReason, prepareWAMessageMedia } from '@whiskeysockets/baileys'
+import makeWASocket, { useMultiFileAuthState, DisconnectReason, prepareWAMessageMedia } from 'baileys'
 import pino from 'pino'
 import { createHash, hkdfSync } from 'node:crypto'
 import { createDecipheriv } from 'node:crypto'
