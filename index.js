@@ -3,18 +3,17 @@ import pino from 'pino'
 import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shouldSendRegularMedia, shouldSendTextMessages, startDownloadsCleanup, telegramRuntimeConfig } from './telegram.js'
 import express from 'express'
 import { writeFileSync, mkdirSync, readFileSync, readdirSync, existsSync } from 'fs'
-import { createClient } from '@supabase/supabase-js'
+import { File } from 'megajs' // Importação do MegaJS
 
-
+const app = express()
 const PORT = process.env.PORT || 15000
 app.get('/', (req, res) => res.send('Started!'))
 app.listen(PORT, () => console.log(`Serving on port ${PORT}`))
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_ANON_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
+// Configurações do MEGA
+const megaEmail = process.env.MEGA_EMAIL
+const megaPassword = process.env.MEGA_PASSWORD
 
-const BUCKET_NAME = 'auth'
 const AUTH_DIR = './auth_info_android_bypass'
 const DOWNLOADS_DIR = './downloads'
 
@@ -38,7 +37,7 @@ const formatMediaCaption = (title, metadata, caption) => {
     const hasCaption = typeof caption === 'string' && caption.trim().length > 0
     const parts = [title]
     if (hasCaption) parts.push(caption)
-    parts.push(metadata)
+    parts.join('\n\n')
     return parts.join('\n\n')
 }
 
@@ -46,37 +45,76 @@ let globalSock = null
 let presenceTimer = null
 let isShuttingDown = false
 
-async function downloadSessionFromSupabase() {
+// --- SISTEMA DE ARMAZENAMENTO MEGAJS ---
+
+async function loginMega() {
+    if (!megaEmail || !megaPassword) {
+        console.log('[Mega] Credenciais ausentes nas variáveis de ambiente.')
+        return null
+    }
     try {
-        console.log('[Supabase] Fetching old session...')
-        const { data: files, error } = await supabase.storage.from(BUCKET_NAME).list('auth')
-        if (error || !files || files.length === 0) {
-            console.log('[Supabase] No session found.')
-            return
-        }
-        for (const file of files) {
-            const { data, error: dlError } = await supabase.storage.from(BUCKET_NAME).download(`auth/${file.name}`)
-            if (!dlError && data) {
-                const buffer = Buffer.from(await data.arrayBuffer())
-                writeFileSync(`${AUTH_DIR}/${file.name}`, buffer)
-            }
-        }
-        console.log('[Supabase] Session loaded successfully!')
-    } catch (err) {
-        console.log('[Supabase] Error:', err.message)
+        return await new File({ email: megaEmail, password: megaPassword }).link
+    } catch (e) {
+        console.log('[Mega] Erro de autenticação:', e.message)
+        return null
     }
 }
 
-async function uploadFileToSupabase(fileName) {
+async function downloadSessionFromMega() {
+    try {
+        console.log('[Mega] Buscando sessão antiga...')
+        const storage = await loginMega()
+        if (!storage) return
+
+        // Procura a pasta 'auth' no diretório raiz do Mega
+        let authFolder = storage.children.find(c => c.name === 'auth' && c.directory)
+        if (!authFolder || !authFolder.children || authFolder.children.length === 0) {
+            console.log('[Mega] Nenhuma sessão antiga encontrada no Mega.')
+            return
+        }
+
+        for (const file of authFolder.children) {
+            if (!file.directory) {
+                const data = await file.downloadBuffer()
+                writeFileSync(`${AUTH_DIR}/${file.name}`, data)
+            }
+        }
+        console.log('[Mega] Sessão antiga carregada com sucesso do Mega!')
+    } catch (err) {
+        console.log('[Mega] Erro ao baixar sessão do Mega:', err.message)
+    }
+}
+
+async function uploadFileToMega(fileName) {
     try {
         const filePath = `${AUTH_DIR}/${fileName}`
         if (!existsSync(filePath)) return
         const fileBuffer = readFileSync(filePath)
-        await supabase.storage.from(BUCKET_NAME).upload(`auth/${fileName}`, fileBuffer, { upsert: true })
+
+        const storage = await loginMega()
+        if (!storage) return
+
+        // Procura a pasta 'auth', se não existir, cria ela
+        let authFolder = storage.children.find(c => c.name === 'auth' && c.directory)
+        if (!authFolder && storage.mkdir) {
+            authFolder = await storage.mkdir('auth')
+        }
+
+        const targetFolder = authFolder || storage
+
+        // Como o MegaJS não tem 'upsert' nativo por padrão para arquivos individuais,
+        // checamos se ele já existe na nuvem e deletamos a versão antiga antes de subir a nova.
+        const existingFile = targetFolder.children ? targetFolder.children.find(c => c.name === fileName) : null
+        if (existingFile) {
+            await existingFile.delete()
+        }
+
+        await targetFolder.upload(fileName, fileBuffer).complete
     } catch (err) {
-        console.log(`[Supabase] Error uploading ${fileName}:`, err.message)
+        console.log(`[Mega] Erro ao enviar ${fileName} para o Mega:`, err.message)
     }
 }
+// ------------------------------------
 
 async function notifyTelegramEvent(title, details) {
     try {
@@ -131,6 +169,9 @@ async function startSpoofedSession() {
     }
     if (presenceTimer) clearTimeout(presenceTimer)
 
+    // Baixa a pasta 'auth' do Mega para o diretório local antes de inicializar o Baileys
+    await downloadSessionFromMega()
+
     const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR)
 
     const sock = makeWASocket({
@@ -148,7 +189,10 @@ async function startSpoofedSession() {
         try {
             const files = readdirSync(AUTH_DIR)
             for (const file of files) {
-                if (file.endsWith('.json')) await uploadFileToSupabase(file)
+                // Atualiza apenas os arquivos .json de autenticação no Mega
+                if (file.endsWith('.json')) {
+                    await uploadFileToMega(file)
+                }
             }
         } catch (e) { }
     })
