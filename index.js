@@ -5,6 +5,7 @@ import qrcode from 'qrcode-terminal'
 import { createClient } from '@supabase/supabase-js'
 import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shouldSendRegularMedia, shouldSendTextMessages, startDownloadsCleanup, telegramRuntimeConfig } from './telegram.js'
 import { startStickerBridge } from './sticker-bridge.js'
+import express from 'express'
 
 const supabaseUrl = process.env.SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY
