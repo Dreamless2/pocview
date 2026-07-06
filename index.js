@@ -111,7 +111,7 @@ async function uploadFileToMega(fileName) {
 
         await targetFolder.upload(fileName, fileBuffer).complete
     } catch (err) {
-        console.log(`[Mega] Erro ao enviar ${fileName} para o Mega:`, err.message)
+        console.log(`[Mega] Error  ${fileName} para o Mega:`, err.message)
     }
 }
 // ------------------------------------
