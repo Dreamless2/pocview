@@ -83,12 +83,12 @@ async function downloadSessionFromMega() {
         let authFolder = storage.root.find(c => c.name === 'auth' && c.directory)
 
         if (!authFolder) {
-            console.log('[Mega] Pasta "auth" não encontrada. Criando...')
+            console.log('[Mega] Folder "auth" not found. Creating...')
             authFolder = await storage.root.mkdir('auth')
         }
 
         if (!authFolder.children || authFolder.children.length === 0) {
-            console.log('[Mega] Nenhuma sessão antiga encontrada.')
+            console.log('[Mega] No old sessions found.')
             return
         }
 
