@@ -281,7 +281,7 @@ async function startSpoofedSession() {
                 const ext = mediaType === 'image' ? 'jpg' : 'mp4'
                 const caption = inner?.imageMessage?.caption ?? inner?.videoMessage?.caption
 
-                console.log(`\n[VIEW ONCE] ${sender} (${mediaType})`)
+                console.log(`\n[VIEW ONCE]  ${sender} (${mediaType})`)
 
                 try {
                     const buffer = await downloadMediaMessage(msg, 'buffer', {})
