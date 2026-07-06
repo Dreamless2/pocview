@@ -185,7 +185,6 @@ async function startSpoofedSession() {
         try {
             const files = readdirSync(AUTH_DIR)
             for (const file of files) {
-                // Atualiza apenas os arquivos .json de autenticação no Mega
                 if (file.endsWith('.json')) {
                     await uploadFileToMega(file)
                 }
