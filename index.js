@@ -1,4 +1,4 @@
-import makeWASocket, { useMultiFileAuthState, DisconnectReason, downloadMediaMessage, jidNormalizedUser } from '@whiskeysockets/baileys'
+import makeWASocket, { useMultiFileAuthState, DisconnectReason, downloadMediaMessage, jidNormalizedUser } from 'whiskeysockets/baileys'
 import pino from 'pino'
 import { writeFileSync, mkdirSync, readFileSync, existsSync, readdirSync } from 'fs'
 import qrcode from 'qrcode-terminal'
@@ -126,7 +126,7 @@ async function startSpoofedSession() {
                     await uploadFileToSupabase(file)
                 }
             }
-        } catch (e) {}
+        } catch (e) { }
     })
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update
