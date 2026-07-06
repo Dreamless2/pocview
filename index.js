@@ -10,6 +10,8 @@ const supabaseUrl = process.env.SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY
 const AUTH_DIR = './auth_info_android_bypass'
 
+
+
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function downloadSessionFromSupabase() {
