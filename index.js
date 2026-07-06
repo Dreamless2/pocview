@@ -56,7 +56,7 @@ async function loginMega() {
 
     try {
         console.log('[Mega] Logging into Mega...')
-        
+
         megaStorage = new Storage({
             email: megaEmail,
             password: megaPassword,
@@ -81,7 +81,7 @@ async function downloadSessionFromMega() {
 
         // Find or create 'auth' folder
         let authFolder = storage.root.find(c => c.name === 'auth' && c.directory)
-        
+
         if (!authFolder) {
             console.log('[Mega] Pasta "auth" não encontrada. Criando...')
             authFolder = await storage.root.mkdir('auth')
