@@ -17,6 +17,7 @@ app.get('/', (req, res) => {
 app.use((req, res) => {
     res.status(404).send('Not Found');
 });
+// 500 error
 
 
 
