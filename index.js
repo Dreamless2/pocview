@@ -9,7 +9,7 @@ const app = express()
 const port = 10000;
 
 app.get('/', (req, res) => {
-    res.send('Servidor do Bot está ativo!');
+    res.send('Running!');
 });
 
 app.listen(port, () => {
