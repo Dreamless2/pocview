@@ -6,7 +6,7 @@ import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shou
 import express from 'express'
 import helmet from 'helmet'
 
-const helmet = helmet()
+const app = express()
 const PORT = process.env.PORT || 10000;
 
 app.use(helmet());
