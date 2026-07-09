@@ -185,5 +185,4 @@ async function startSpoofedSession() {
     })
 }
 
-// EXECUÇÃO DE FATO: Executa a função para o bot começar a rodar junto com o Express
 startSpoofedSession()
