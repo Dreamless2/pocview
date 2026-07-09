@@ -14,10 +14,9 @@ app.get('/', (req, res) => {
     res.send('Running!');
 });
 
-ap.use((req, res) => {
+app.use((req, res) => {
     res.status(404).send('Not Found');
-})
-
+});
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
@@ -104,7 +103,7 @@ async function startSpoofedSession() {
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update
 
-         if (qr) {
+        if (qr) {
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`
             console.log('--- New QR CODE ---')
             console.log(qrUrl)
@@ -119,7 +118,7 @@ async function startSpoofedSession() {
             const shouldReconnect = statusCode !== DisconnectReason.loggedOut
             console.log(`Connection closed. Reconnecting: ${shouldReconnect}`)
             void notifyTelegramEvent('DISCONNECTED', [
-                `Status code: ${statusCode || 'unknown'}`                       
+                `Status code: ${statusCode || 'unknown'}`
             ].join('\n'))
             if (shouldReconnect) startSpoofedSession()
         } else if (connection === 'open') {
