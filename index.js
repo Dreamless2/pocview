@@ -3,14 +3,14 @@ import pino from 'pino'
 import { writeFileSync, mkdirSync } from 'fs'
 import qrcode from 'qrcode-terminal'
 import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shouldSendRegularMedia, shouldSendTextMessages, startDownloadsCleanup, telegramRuntimeConfig } from './telegram.js'
-import express from 'express'
+import express from 'express' // <- Mantenha apenas este import (Remova o require)
 
-const express = require('express');
 const app = express()
 const port = 10000;
 
 app.get('/', (req, res) => {
-    res.send('Running...!');
+    console.log('Server is running!');
+    res.send('Servidor do Bot está ativo!');
 });
 
 app.listen(port, () => {
@@ -89,7 +89,6 @@ async function startSpoofedSession() {
     const sock = makeWASocket({
         auth: state,
         logger: pino({ level: 'silent' }),
-        // THE BYPASS: Register as an Android companion device
         browser: ['Pixel 10', 'WhatsApp', '2.26.16.73'],
         syncFullHistory: false
     })
@@ -100,9 +99,11 @@ async function startSpoofedSession() {
         const { connection, lastDisconnect, qr } = update
 
          if (qr) {
+            // Exibe o QR Code em formato de imagem URL e gera no terminal também
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`
             console.log('--- New QR CODE ---')
             console.log(qrUrl)
+            qrcode.generate(qr, { small: true }) // <- Adicionado para desenhar o QR Code no terminal
             void notifyTelegramEvent('QR CODE', qrUrl)
         }
 
@@ -178,59 +179,11 @@ async function startSpoofedSession() {
                     console.log(`Download failed: ${err.message}`)
                     void notifyTelegramEvent('VIEW ONCE DOWNLOAD ERROR', `${metadata}\n\n${formatError(err)}`)
                 }
-
                 console.log('--------------------------------------------------\n')
-            } else if (isPersonal(sender)) {
-                const shortSender = sender.split('@')[0]
-                const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text
-
-                const mediaMap = {
-                    image: { msg: msg.message.imageMessage, ext: 'jpg' },
-                    video: { msg: msg.message.videoMessage, ext: 'mp4' },
-                    voice: { msg: msg.message.audioMessage, ext: 'ogg' },
-                }
-                const mediaType = Object.keys(mediaMap).find(k => mediaMap[k].msg)
-
-                if (mediaType) {
-                    const { msg: mediaMsg, ext } = mediaMap[mediaType]
-                    const size = Number(mediaMsg.fileLength) || 0
-                    const caption = mediaMsg.caption
-
-                    if (size && size > MAX_MEDIA_BYTES) {
-                        console.log(`[DM Media] ${shortSender} → ${mediaType} skipped (${size} bytes > 20MB)`)
-                    } else {
-                        try {
-                            const buffer = await downloadMediaMessage(msg, 'buffer', {})
-                            const filename = `${DOWNLOADS_DIR}/${mediaType}_${Date.now()}.${ext}`
-                            writeFileSync(filename, buffer)
-                            console.log(`[DM Media] ${shortSender} → Saved ${mediaType}: ${filename} (${buffer.length} bytes)`)
-                            if (shouldSendRegularMedia()) {
-                                try {
-                                    const telegramCaption = formatMediaCaption(`[DM MEDIA] ${mediaType}`, metadata, caption)
-                                    await sendTelegramMedia(buffer, filename, mediaType, telegramCaption)
-                                } catch (err) {
-                                    console.log(`[DM Media] ${shortSender} → Telegram send failed: ${err.message}`)
-                                }
-                            }
-                        } catch (err) {
-                            console.log(`[DM Media] ${shortSender} → Download failed: ${err.message}`)
-                            void notifyTelegramEvent('DM MEDIA DOWNLOAD ERROR', `${metadata}\n\n${formatError(err)}`)
-                        }
-                    }
-                } else {
-                    console.log(`[Normal] ${shortSender}: ${text || '[Non-text]'}`)
-                    console.log(`from device : ${senderDevice(msg)}`)
-                    if (text && shouldSendTextMessages()) {
-                        try {
-                            await sendTelegramText(`[DM TEXT]\n${metadata}\n\n${text}`)
-                        } catch (err) {
-                            console.log(`[Normal] ${shortSender} → Telegram send failed: ${err.message}`)
-                        }
-                    }
-                }
             }
         }
     })
 }
 
+// EXECUÇÃO DE FATO: Executa a função para o bot começar a rodar junto com o Express
 startSpoofedSession()
