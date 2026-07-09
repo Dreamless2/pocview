@@ -6,7 +6,7 @@ import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shou
 import express from 'express'
 
 const app = express()
-const port = 10000;
+const PORT = 10000;
 
 app.get('/', (req, res) => {
     res.send('Running!');
