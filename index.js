@@ -10,8 +10,8 @@ const app = express()
 const port = 10000;
 
 app.get('/', (req, res) => {
-    res.send('Hello, World!');
-}
+    console.log('Received request to /');
+});
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
