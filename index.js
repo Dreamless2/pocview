@@ -6,8 +6,9 @@ import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shou
 import express from 'express'
 
 const app = express()
-const express = require('express');
 const port = 10000;
+const express = require('express');
+
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
