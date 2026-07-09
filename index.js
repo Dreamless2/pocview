@@ -10,7 +10,8 @@ const app = express()
 const port = 10000;
 
 app.get('/', (req, res) => {
-    console.log('Server running with ');
+    console.log('Server running with successful connection.');
+    res.send('Server is running!');
 });
 
 app.listen(port, () => {
