@@ -5,8 +5,13 @@ import qrcode from 'qrcode-terminal'
 import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shouldSendRegularMedia, shouldSendTextMessages, startDownloadsCleanup, telegramRuntimeConfig } from './telegram.js'
 import express from 'express'
 
+const express = require('express');
 const app = express()
 const port = 10000;
+
+app.get('/', (req, res) => {
+    res.send('Hello, World!');
+}
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
