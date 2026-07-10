@@ -8,10 +8,6 @@ import express from 'express'
 const app = express()
 const PORT = process.env.PORT || 10000;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 3603131 (index.js)
 app.get('/', (req, res) => {
     res.send('Running!');
 });
