@@ -49,7 +49,7 @@ async function downloadAuthFromFilen() {
             const buffer = await filen.fs.readFile({ path: `/auth_info_android_bypass/${filename}` })
             writeFileSync(path.join(LOCAL_AUTH_DIR, filename), buffer)
         }
-        console.log('[Filen] Session !')
+        console.log('[Filen] Session downloaded!')
     } catch (err) {
         console.log(`[Filen] Nenhuma sessão prévia encontrada ou erro ao baixar: ${err.message}`)
     }
