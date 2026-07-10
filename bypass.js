@@ -19,7 +19,6 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
 
-// --- CONFIGURAÇÃO FILEN ---
 const filen = new FilenSDK({
     metadataCache: true, 
     connectToSocket: true, 
@@ -31,12 +30,10 @@ await filen.login({
     password: process.env.FILEN_PASSWORD || "", 
 })
 
-// Pastas locais temporárias (Staging)
 const LOCAL_TMP_DIR = path.join(os.tmpdir(), 'waview_tmp')
 const LOCAL_AUTH_DIR = path.join(LOCAL_TMP_DIR, 'auth')
 mkdirSync(LOCAL_AUTH_DIR, { recursive: true })
 
-// Garantir que as pastas existem no Filen
 try {
     await filen.fs.mkdir({ path: "/downloads" })
     await filen.fs.mkdir({ path: "/auth_info_android_bypass" })
