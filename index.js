@@ -37,7 +37,7 @@ await filen.fs.mkdir({
 })
 
 await filen.fs.mkdir({
-    path: "auth_info_android_bypass"
+    path: "/auth_info_android_bypass"
 })
 
 const PERSONAL_SUFFIXES = ['@s.whatsapp.net', '@lid', '@c.us']
