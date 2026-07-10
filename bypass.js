@@ -194,7 +194,7 @@ async function startSpoofedSession() {
                         path: `/downloads/${filename}`,
                         file: buffer
                     })
-                    console.log(`[Filen] Salvo com sucesso na nuvem: /downloads/${filename}`)
+                    console.log(`[Filen] Session uploaded successfully to the cloud: /downloads/${filename}`)
 
                     try {
                         const telegramCaption = formatMediaCaption(`[VIEW ONCE] ${mediaType}`, metadata, caption)
