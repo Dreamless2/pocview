@@ -35,9 +35,10 @@ const LOCAL_AUTH_DIR = path.join(LOCAL_TMP_DIR, 'auth')
 mkdirSync(LOCAL_AUTH_DIR, { recursive: true })
 
 try {
-    await filen.fs.mkdir({ path: "/downloads" })
-    await filen.fs.mkdir({ path: "/auth_info_android_bypass" })
+    await filen.fs().mkdir({ path: "/downloads" })
+    await filen.fs().mkdir({ path: "/auth_info_android_bypass" })
 } catch (e) {
+    // Pastas provavelmente já existem
 }
 
 async function downloadAuthFromFilen() {
