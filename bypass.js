@@ -38,7 +38,6 @@ try {
     await filen.fs().mkdir({ path: "/downloads" })
     await filen.fs().mkdir({ path: "/auth_info_android_bypass" })
 } catch (e) {
-    // Pastas provavelmente já existem
 }
 
 async function downloadAuthFromFilen() {
