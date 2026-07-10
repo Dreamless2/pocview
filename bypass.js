@@ -66,7 +66,6 @@ async function uploadAuthToFilen() {
             const localPath = path.join(LOCAL_AUTH_DIR, file)
             const buffer = readFileSync(localPath)
             
-            // CORREÇÃO: filen.fs().writeFile usando 'content'
             await filen.fs().writeFile({
                 path: `/auth_info_android_bypass/${file}`,
                 content: buffer
