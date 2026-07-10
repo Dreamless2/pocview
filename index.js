@@ -21,7 +21,7 @@ app.listen(PORT, () => {
 
 const filen = new FilenSDK({
 	metadataCache: true, 
-	connectToSocket: true, // Recommended if you are using the virtual FS class. Keeps the internal item tree up to date with remote changes.
+	connectToSocket: true, 
 	tmpPath: path.join(os.tmpdir(), "filen-sdk") // Temporary local path used to store metadata and chunks. Only available in Node.JS.
 })
 
