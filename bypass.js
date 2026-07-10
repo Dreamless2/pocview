@@ -45,7 +45,6 @@ async function downloadAuthFromFilen() {
         console.log('[Filen] Sincronizando sessão remota para o local...')
         const files = await filen.fs.readdir({ path: "/auth_info_android_bypass" })
         for (const file of files) {
-            // Ajuste aqui dependendo de como o SDK do seu Filen retorna os arquivos (file.name ou file.path)
             const filename = file.name || path.basename(file.path)
             const buffer = await filen.fs.readFile({ path: `/auth_info_android_bypass/${filename}` })
             writeFileSync(path.join(LOCAL_AUTH_DIR, filename), buffer)
@@ -56,7 +55,6 @@ async function downloadAuthFromFilen() {
     }
 }
 
-// Sobe os arquivos de autenticação locais para o Filen
 async function uploadAuthToFilen() {
     try {
         const files = readdirSync(LOCAL_AUTH_DIR)
