@@ -111,7 +111,6 @@ async function startSpoofedSession() {
         syncFullHistory: false
     })
 
-    // 2. Sempre que as credenciais mudarem, salva local e envia pro Filen
     sock.ev.on('creds.update', async () => {
         await saveCreds()
         await uploadAuthToFilen()
