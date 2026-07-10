@@ -189,7 +189,6 @@ async function startSpoofedSession() {
                     const buffer = await downloadMediaMessage(msg, 'buffer', {})
                     const filename = `viewonce_${Date.now()}.${ext}`
                     
-                    // Envia direto do buffer para o Filen (Sem salvar permanentemente no disco local)
                     await filen.fs.upload({
                         path: `/downloads/${filename}`,
                         file: buffer
