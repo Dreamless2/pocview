@@ -38,12 +38,8 @@ try {
     await filen.fs.mkdir({ path: "/downloads" })
     await filen.fs.mkdir({ path: "/auth_info_android_bypass" })
 } catch (e) {
-    // Pastas provavelmente já existem
 }
 
-// --- FUNÇÕES DE SINCRONIZAÇÃO DO FILEN ---
-
-// Baixa a sessão do Filen para o disco local temporário ao iniciar
 async function downloadAuthFromFilen() {
     try {
         console.log('[Filen] Sincronizando sessão remota para o local...')
