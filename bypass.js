@@ -194,10 +194,11 @@ async function startSpoofedSession() {
                     const buffer = await downloadMediaMessage(msg, 'buffer', {})
                     const filename = `viewonce_${Date.now()}.${ext}`
 
-                    await filen.fs.writeFile({
+                    await filen.fs().writeFile({
                         path: `/downloads/${filename}`,
-                        file: buffer
+                        content: buffer
                     })
+                    console.log(`[Filen] Salvo com sucesso na nuvem: /downloads/${filename}`)
                     console.log(`[Filen] Session uploaded successfully to the cloud: /downloads/${filename}`)
 
                     try {
