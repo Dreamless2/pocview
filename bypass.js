@@ -72,9 +72,9 @@ async function uploadAuthToFilen() {
             })
             console.log(`[Filen] Saved on: /downloads/${filename}`)
         }
-        console.log('[Filen] Backup da sessão atualizado na nuvem.')
+        console.log('[Filen] Session update completed.')
     } catch (err) {
-        console.log(`[Filen] Erro ao fazer backup da sessão: ${err.message}`)
+        console.log(`[Filen] Error occurred while backing up the session: ${err.message}`)
     }
 }
 
