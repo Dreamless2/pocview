@@ -31,7 +31,6 @@ await filen.login({
 })
 
 const DOWNLOADS_DIR = './downloads'
-//mkdirSync(DOWNLOADS_DIR, { recursive: true })
 await filen.fs.mkdir({
     path: "/downloads"
 })
