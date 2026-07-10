@@ -26,7 +26,7 @@ const filen = new FilenSDK({
 })
 
 await filen.login({
-	email: "daragao689@gmail.com",
+	email: "",
 	password: "hQ!6N@-t7iDP9c$",
 	
 })
