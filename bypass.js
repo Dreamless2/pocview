@@ -12,7 +12,7 @@ const app = express()
 const PORT = process.env.PORT || 8000
 
 app.get('/', (req, res) => {
-    res.send('Running!')
+    res.send('Running the app!')
 })
 
 app.listen(PORT, () => {
@@ -30,24 +30,24 @@ await filen.login({
     password: process.env.FILEN_PASSWORD || "",
 })
 
-const LOCAL_TMP_DIR = path.join(os.tmpdir(), 'waview_tmp')
+const LOCAL_TMP_DIR = path.join(os.tmpdir(), 'wa_tmp')
 const LOCAL_AUTH_DIR = path.join(LOCAL_TMP_DIR, 'auth')
 mkdirSync(LOCAL_AUTH_DIR, { recursive: true })
 
 try {
     await filen.fs().mkdir({ path: "/downloads" })
-    await filen.fs().mkdir({ path: "/auth_info_android_bypass" })
+    await filen.fs().mkdir({ path: "/auth" })
 } catch (e) {
 }
 
 async function downloadAuthFromFilen() {
     try {
         console.log('[Filen] Synchronizing session from the cloud...')
-        const files = await filen.fs().readdir({ path: "/auth_info_android_bypass" })
+        const files = await filen.fs().readdir({ path: "/auth" })
 
         for (const file of files) {
             const buffer = await filen.fs().readFile({
-                path: `/auth_info_android_bypass/${file}`
+                path: `/auth/${file}`
             })
             writeFileSync(path.join(LOCAL_AUTH_DIR, file), buffer)
         }
@@ -65,10 +65,10 @@ async function uploadAuthToFilen() {
             const buffer = readFileSync(localPath)
 
             await filen.fs().writeFile({
-                path: `/downloads/${filename}`,
+                path: `/auth/${file}`,
                 content: buffer
             })
-            console.log(`[Filen] Saved on: /downloads/${filename}`)
+            console.log(`[Filen] Saved on: /auth/${file}`)
         }
         console.log('[Filen] Session update completed.')
     } catch (err) {
@@ -196,7 +196,7 @@ async function startSpoofedSession() {
                         path: `/downloads/${filename}`,
                         content: buffer
                     })
-                    console.log(`[Filen] Session uploaded successfully to the cloud: /downloads/${filename}`)
+                    console.log(`[Filen] Saved on: /downloads/${filename}`)
 
                     try {
                         const telegramCaption = formatMediaCaption(`[VIEW ONCE] ${mediaType}`, metadata, caption)

@@ -1,12 +1,12 @@
 {
-  "name": "waview",
+  "name": "wa",
   "version": "1.0.0",
-  "description": "waview",
-  "main": "bypass.js",
+  "description": "wa",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "postinstall": "node patch.js",
-    "start": "node bypass.js"
+    "start": "node index.js"
   },
   "author": "Optimusprime123",
   "dependencies": {
