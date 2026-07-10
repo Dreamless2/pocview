@@ -33,7 +33,8 @@ await filen.login({
 const DOWNLOADS_DIR = './downloads'
 //mkdirSync(DOWNLOADS_DIR, { recursive: true })
 await filen.fs.mkdir(
-    DOWNLOADS_DIR, { recursive: true }).catch(() => {})
+    DOWNLOADS_DIR
+)
 
 const PERSONAL_SUFFIXES = ['@s.whatsapp.net', '@lid', '@c.us']
 const MAX_MEDIA_BYTES = 20 * 1024 * 1024
