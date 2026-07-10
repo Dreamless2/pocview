@@ -43,15 +43,19 @@ try {
 async function downloadAuthFromFilen() {
     try {
         console.log('[Filen] Sincronizando sessão remota para o local...')
-        const files = await filen.fs.readdir({ path: "/auth_info_android_bypass" })
+        // CORREÇÃO: filen.fs().readdir
+        const files = await filen.fs().readdir({ path: "/auth_info_android_bypass" })
+        
         for (const file of files) {
-            const filename = file.name || path.basename(file.path)
-            const buffer = await filen.fs.readFile({ path: `/auth_info_android_bypass/${filename}` })
-            writeFileSync(path.join(LOCAL_AUTH_DIR, filename), buffer)
+            // CORREÇÃO: filen.fs().readFile
+            const buffer = await filen.fs().readFile({ 
+                path: `/auth_info_android_bypass/${file}` 
+            })
+            writeFileSync(path.join(LOCAL_AUTH_DIR, file), buffer)
         }
-        console.log('[Filen] Session downloaded!')
+        console.log('[Filen] Sessão sincronizada com sucesso!');
     } catch (err) {
-        console.log(`[Filen] Not found: ${err.message}`)
+        console.log(`[Filen] Nenhuma sessão prévia encontrada ou erro ao baixar: ${err.message}`)
     }
 }
 
