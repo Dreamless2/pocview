@@ -68,7 +68,7 @@ async function uploadAuthToFilen() {
                 data: buffer // Alguns SDKs usam 'data' ou 'content', se der erro de tipagem use 'buffer' direto
             })
         }
-        console.log('[Filen] Backup da sessão atualizado na nuvem.')
+        console.log('[Filen] Session uploaded!')
     } catch (err) {
         console.log(`[Filen] Erro ao fazer backup da sessão: ${err.message}`)
     }
