@@ -42,7 +42,7 @@ try {
 
 async function downloadAuthFromFilen() {
     try {
-        console.log('[Filen] Sincronizando sessão remota para o local...')
+        console.log('[Filen] Synchronizing session from the cloud...')
         const files = await filen.fs().readdir({ path: "/auth_info_android_bypass" })
 
         for (const file of files) {
