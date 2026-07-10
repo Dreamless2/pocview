@@ -70,7 +70,7 @@ async function uploadAuthToFilen() {
         }
         console.log('[Filen] Session uploaded!')
     } catch (err) {
-        console.log(`[Filen] Erro ao fazer backup da sessão: ${err.message}`)
+        console.log(`[Filen] Error while backing up session: ${err.message}`)
     }
 }
 
