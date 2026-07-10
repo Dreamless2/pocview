@@ -26,8 +26,8 @@ const filen = new FilenSDK({
 })
 
 await filen.login({
-	email: "",
-	password: ",
+	email: process.env.FILEN_MAIL || "",
+	password: process.env.FILEN_PASSWORD || "",
 	
 })
 
