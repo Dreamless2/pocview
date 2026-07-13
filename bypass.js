@@ -6,7 +6,7 @@ import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shou
 import { startStickerBridge } from './sticker-bridge.js'
 import express from 'express'
 
-// Create an Express app to serve the downloads folder
+// Create an Express app to serve / on port 8000 from e
 
 const DOWNLOADS_DIR = './downloads'
 mkdirSync(DOWNLOADS_DIR, { recursive: true })
