@@ -237,5 +237,4 @@ async function startSpoofedSession() {
     })
 }
 
-startStickerBridge(() => activeWhatsAppSocket)
 startSpoofedSession()
