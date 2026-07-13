@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
     res.send('Running the server')
 })
 app.listen(PORT, () => {
-    console.log(`Express server running on port ${PORT}`)
+    console.log(`Server running on port ${PORT}`)
 })
 
 const DOWNLOADS_DIR = './downloads'
