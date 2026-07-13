@@ -9,7 +9,7 @@ import express from 'express'
 const app = express()
 const PORT = process.env.PORT || 8000
 app.get('/', (req, res) => {
-    res.send('waview is running')
+    res.send('Running')
 })
 app.listen(PORT, () => {
     console.log(`Express server running on port ${PORT}`)
