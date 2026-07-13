@@ -16,8 +16,6 @@ app.listen(PORT, () => {
     console.log(`Express server running on port ${PORT}`)
 })
 
-
-
 const DOWNLOADS_DIR = './downloads'
 mkdirSync(DOWNLOADS_DIR, { recursive: true })
 
