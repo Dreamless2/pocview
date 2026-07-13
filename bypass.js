@@ -7,7 +7,14 @@ import { startStickerBridge } from './sticker-bridge.js'
 import express from 'express'
 
 // Create an Express app to serve / on port 8000 from .env
-
+const app = express()
+const PORT = process.env.PORT || 8000
+app.get('/', (req, res) => {
+    res.send('waview is running')
+})
+app.listen(PORT, () => {
+    console.log(`Express server running on port ${PORT}`)
+})
 
 
 
