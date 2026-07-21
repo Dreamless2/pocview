@@ -3,16 +3,6 @@ import pino from 'pino'
 import { writeFileSync, mkdirSync } from 'fs'
 import qrcode from 'qrcode-terminal'
 import { senderDevice, senderMetadata, sendTelegramMedia, sendTelegramText, shouldSendRegularMedia, shouldSendTextMessages, startDownloadsCleanup, telegramRuntimeConfig } from './telegram.js'
-import express from 'express'
-
-const app = express()
-const PORT = process.env.PORT || 8000
-app.get('/', (req, res) => {
-    res.send('Running the server')
-})
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-})
 
 const DOWNLOADS_DIR = './downloads'
 mkdirSync(DOWNLOADS_DIR, { recursive: true })
