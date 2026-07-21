@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server executing in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`Server executing On port ${PORT}`);
 });
 
 const DOWNLOADS_DIR = './downloads'
